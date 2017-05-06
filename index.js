@@ -7,7 +7,10 @@ fetch('rom.vms')
         const rom = new Uint8Array(buf);
         const cpu = new CPU(rom);
 
-        while (true) {
+        function tick() {
             cpu.step();
+            setTimeout(tick, 100);
         }
+
+        setTimeout(tick, 100);
     });
