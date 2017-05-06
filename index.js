@@ -1,5 +1,6 @@
 // @flow
 import CPU from './lib/CPU';
+import Utils from './lib/Utils';
 
 fetch('rom.vms')
     .then(resp => resp.arrayBuffer())
@@ -7,14 +8,30 @@ fetch('rom.vms')
         const rom = new Uint8Array(buf);
         const cpu = new CPU(rom);
 
-        /*function tick() {
-            cpu.step();
-            setTimeout(tick, 1);
+        let good = 0;
+        let total = 0;
+        const unimplemented = [];
+
+        for (let i = 0; i <= 0xff; ++i) {
+            const rom = new Uint8Array([i, 0, 0]);
+            const cpu = new CPU(rom);
+
+            try {
+                cpu.step();
+                ++good;
+            } catch (e) {
+                unimplemented.push(Utils.hex_d9(i));
+            }
+            ++total;
         }
 
-        setTimeout(tick, 1);*/
+        console.log(`${good / total * 100}% instructions implemented.`);
+        console.log(`Missing instructions: ${unimplemented.join(', ')}`);
 
-        while(true) {
+        function tick() {
             cpu.step();
+            setTimeout(tick, 100);
         }
+
+        setTimeout(tick, 100);
     });
